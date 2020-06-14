@@ -1,0 +1,20 @@
+def git_auth = "665ed1ba-8719-4ead-93b7-076842d47e78"
+node {
+    stage('Pull code') {
+        checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${git_auth}", url: 'https://gitee.com/hanpxg/socke-market.git']]])
+    }
+    stage('Build Images') {
+         sh "mvn -f common-server clean install"
+         sh "mvn -f eureka-server clean package dockerfile:build"
+         sh "mvn -f zuul-server clean package dockerfile:build"
+         sh "mvn -f user-server clean package dockerfile:build"
+         sh "mvn -f company-server clean package dockerfile:build"
+    }
+    stage('Run Images') {
+        sh "docker run -d --name=eureka-server -p 8761:8761 eureka-server"
+        sh "docker run -d --name=user-server -p 8859:8859 user-server"
+        sh "docker run -d --name=company-server -p 8857:8857 company-server"
+        sh "docker run -d --name=zuul-server -p 8860:8860 zuul-server"
+
+    }
+}

@@ -1,0 +1,25 @@
+server:
+  port: 8088
+spring:
+  application:
+    name: service-import
+  datasource:
+    url: jdbc:mysql://localhost:3306/fullstack?useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: admin
+    driver-class-name: com.mysql.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+    jpa:
+      database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+      show-sql: true
+      hibernate:
+        ddl-auto: update
+eureka:
+  instance:
+    prefer-ip-address: true   #开启显示IP地址
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}   #eureka页面显示IP地址：端口号
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/

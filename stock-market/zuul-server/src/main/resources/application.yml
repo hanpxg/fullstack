@@ -1,0 +1,154 @@
+spring:
+  profiles:
+    active: prod
+  application:
+    name: StockMarket-Zuul
+  datasource:
+    url: jdbc:mysql://39.96.37.173:3306/fullstack?useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: password
+    driver-class-name: com.mysql.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+server:
+  port: 8860
+
+zuul:
+  sensitive-headers: Access-Control-Allow-Origin,Cookie,Set-Cookie # 会过滤客户端附带的headers. It's to fix error: multiple Access-Control-Allow-Origin
+  ignored-headers: Access-Control-Allow-Origin,Cookie,Set-Cookie
+#  prefix: /api/smc
+#  strip-prefix: false
+
+  routes:
+   zuul-service-import:
+     path: /import-service-zuul/**
+     service-id: service-import
+     sensitive-headers:
+     custom-sensitive-headers: true
+   zuul-service-price:
+     path: /price-service-zuul/**
+     service-id: service-price
+     sensitive-headers:
+     custom-sensitive-headers: true
+   zuul-service-exchange:
+     path: /exchange-service-zuul/**
+     service-id: service-exchange
+     sensitive-headers:
+     custom-sensitive-headers: true
+
+   zuul-service-sector:
+     path: /sector-service-zuul/**
+     service-id: sector-exchanges
+     sensitive-headers:
+     custom-sensitive-headers: true
+#
+#   zuul-service-import:
+#       path: /import-service-zuul/**
+#       service-id: service-import
+#       sensitive-headers:
+#       custom-sensitive-headers: true
+#
+   company-service-price:
+       path: /company-service-zuul/**
+       service-id: service-company
+       sensitive-headers:
+       custom-sensitive-headers: true
+
+#   zuul-service-import:
+#       path: /import-service-zuul/**
+#       service-id: service-import
+#       sensitive-headers:
+#       custom-sensitive-headers: true
+       
+   zuul-service-user:               
+       path: /user-service-zuul/**
+       service-id: service-user    
+       sensitive-headers:      
+       custom-sensitive-headers: true
+
+
+#    service-company: /smccompany/**
+#    service-exchanges: /smcexchange/**
+#    service-import: /smcimport/**
+#    service-price: /smcprice/**
+#    service-user: /smcuser/**
+
+# 设置为true表示开启熔断hystrix，设置false表示关闭熔断机制
+feign:
+  hystrix:
+    enabled: true
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 100000
+ribbon:
+  ReadTimeout: 100000
+  ConnectTimeout: 100000
+
+
+management:
+  endpoints:
+    enabled-by-default: false
+  endpoint:
+    info:
+      enabled: true
+    health:
+      enabled: true
+      show-details: always
+  
+---
+spring:
+  profiles: dev
+      
+eureka:
+  client:
+    service-url:
+      defaultZone: http://39.96.37.173:8761/eureka/
+    healthcheck:
+      enabled: true
+  instance:
+    prefer-ip-address: true   #开启显示IP地址
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}   #eureka页面显示IP地址：端口号
+    #    prefer-ip-address: false
+    #    hostname: localhost
+    #    instance-id: 127.0.0.1:${server.port}
+    lease-expiration-duration-in-seconds: 30
+    lease-renewal-interval-in-seconds: 10
+    
+# a日志设置配置信息
+# logging:
+#   config: classpath:logback-spring.xml
+ 
+---
+spring:
+  profiles: prod
+  
+eureka:
+  client:
+    service-url:
+      defaultZone: http://39.96.37.173:8761/eureka/
+    healthcheck:
+      enabled: true
+  instance:
+    prefer-ip-address: true   #开启显示IP地址
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}   #eureka页面显示IP地址：端口号
+    #    prefer-ip-address: false
+    #    hostname: 106.54.194.33
+    #    instance-id: 106.54.194.33:${server.port}
+    lease-expiration-duration-in-seconds: 30
+    lease-renewal-interval-in-seconds: 10
+    
+# a日志设置配置信息
+# logging:
+#   config: classpath:logback-prod.xm
+

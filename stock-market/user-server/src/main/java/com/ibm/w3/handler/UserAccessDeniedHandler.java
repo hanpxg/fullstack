@@ -1,0 +1,29 @@
+package com.ibm.w3.handler;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+
+@Component
+public class UserAccessDeniedHandler implements AccessDeniedHandler {
+	
+	private static Logger logger = LoggerFactory.getLogger(UserAccessDeniedHandler.class);
+	  
+	@Override
+	public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException e) throws IOException, ServletException {
+	
+		logger.debug("AccessDeniedHandler: FOUND 403 Forbidden");
+		response.sendError(FORBIDDEN.value(), FORBIDDEN.getReasonPhrase());
+	    
+	}
+
+}
